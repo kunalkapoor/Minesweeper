@@ -107,7 +107,7 @@ public class GameBoard {
         Cell cell = getCell(coordinate);
         if (cell.visible)
             return result;
-        if (cell.type == Cell.CellType.Bomb) {
+        if (cell.type == Cell.CellType.Bomb && cell.open()) {
             result.state = GameResult.GameState.Lost;
             return result;
         }
@@ -152,7 +152,7 @@ public class GameBoard {
         cell.flipBombFlag();
     }
 
-    private Cell getCell(Coordinate coordinate) {
+    public Cell getCell(Coordinate coordinate) {
         return cells[coordinate.row][coordinate.col];
     }
 }
