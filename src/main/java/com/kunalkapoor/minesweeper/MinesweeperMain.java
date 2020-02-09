@@ -11,6 +11,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -61,8 +62,13 @@ public class MinesweeperMain extends Application {
             button.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
-                    GameResult result = board.openCell(coordinate);
-                    renderGameBoard(root, result);
+                    if (event.getButton().equals(MouseButton.PRIMARY)) {
+                        GameResult result = board.openCell(coordinate);
+                        renderGameBoard(root, result);
+                    } else if (event.getButton().equals(MouseButton.SECONDARY)) {
+                        board.flipBombFlag(coordinate);
+                        renderGameBoard(root, null);
+                    }
                 }
             });
         }
