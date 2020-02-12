@@ -7,10 +7,8 @@ import com.kunalkapoor.minesweeper.settings.GameSettings;
 import com.kunalkapoor.minesweeper.util.Coordinate;
 import javafx.application.Application;
 import javafx.event.EventHandler;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -27,9 +25,20 @@ public class MinesweeperMain extends Application {
     private Map<Button, Coordinate> buttonMap;
     private GameSettings settings;
 
+    double cellSize = 30.0;
+
+    public MinesweeperMain() {
+        initializeGame();
+    }
+
     @java.lang.Override
     public void start(Stage primaryStage) {
         GridPane root = new GridPane();
+        root.setPrefSize(
+                (settings.boardSettings.numCols + 1) * cellSize,
+                (settings.boardSettings.numRows + 3) * cellSize
+        );
+
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles.css");
 
@@ -41,14 +50,12 @@ public class MinesweeperMain extends Application {
     }
 
     private void playGameGui(GridPane root) {
-        initializeGame(settings);
-
         // Create buttons for each cell
         for (int i = 0; i < settings.boardSettings.numRows; i++) {
             for (int j = 0; j < settings.boardSettings.numCols; j++) {
                 Button button = new Button();
-                button.setMaxSize(30.0, 30.0);
-                button.setMinSize(30.0, 30.0);
+                button.setMaxSize(cellSize, cellSize);
+                button.setMinSize(cellSize, cellSize);
                 root.add(button, j, i);
 
                 Coordinate coordinate = new Coordinate(i, j);
@@ -122,12 +129,10 @@ public class MinesweeperMain extends Application {
         else
             text.setText("You uncovered a bomb and lost... Better luck next time!");
 
-        root.add(text, settings.boardSettings.numCols + 1, settings.boardSettings.numRows + 1);
+        root.add(text, 0, settings.boardSettings.numRows + 1, settings.boardSettings.numCols, 2);
     }
 
     public void playGameCli() {
-        initializeGame(settings);
-
         Scanner scanner = new Scanner(System.in);
         GameResult result = new GameResult();
         while (result.state == GameResult.GameState.Playing) {
@@ -160,11 +165,8 @@ public class MinesweeperMain extends Application {
         return null;
     }
 
-    public void initializeGame(GameSettings settings) {
-        // Harcode the settings until the ability for the user to select is implemented
-        if (settings == null)
-            settings = GameSettings.getInstance(GameSettings.GameDifficulty.Beginner);
-        this.settings = settings;
+    public void initializeGame() {
+        settings = GameSettings.getInstance(GameSettings.GameDifficulty.Expert);
         board = new GameBoard(settings.boardSettings);
         buttonMap = new HashMap<>();
     }

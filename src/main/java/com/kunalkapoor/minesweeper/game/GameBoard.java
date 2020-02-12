@@ -3,6 +3,7 @@ package com.kunalkapoor.minesweeper.game;
 import com.kunalkapoor.minesweeper.settings.BoardSettings;
 import com.kunalkapoor.minesweeper.util.Coordinate;
 
+import java.util.List;
 import java.util.Random;
 
 public class GameBoard {
@@ -74,15 +75,22 @@ public class GameBoard {
         if (cell.type != Cell.CellType.Bomb)
             return;
 
-        Coordinate above = new Coordinate(coordinate.row - 1, coordinate.col);
-        Coordinate below = new Coordinate(coordinate.row + 1, coordinate.col);
+        for (Coordinate neighbour: surroundingCoordinates(coordinate))
+            if (isInBoardBounds(neighbour))
+                getCell(neighbour).incrementValue();
+    }
+
+    private List<Coordinate> surroundingCoordinates(Coordinate coordinate) {
+        Coordinate topLeft = new Coordinate(coordinate.row - 1, coordinate.col - 1);
+        Coordinate top = new Coordinate(coordinate.row - 1, coordinate.col);
+        Coordinate topRight = new Coordinate(coordinate.row - 1, coordinate.col + 1);
+        Coordinate bottomLeft = new Coordinate(coordinate.row + 1, coordinate.col - 1);
+        Coordinate bottom = new Coordinate(coordinate.row + 1, coordinate.col);
+        Coordinate bottomRight = new Coordinate(coordinate.row + 1, coordinate.col + 1);
         Coordinate left = new Coordinate(coordinate.row, coordinate.col - 1);
         Coordinate right = new Coordinate(coordinate.row, coordinate.col + 1);
 
-        if (isInBoardBounds(above)) getCell(above).incrementValue();
-        if (isInBoardBounds(below)) getCell(below).incrementValue();
-        if (isInBoardBounds(left)) getCell(left).incrementValue();
-        if (isInBoardBounds(right)) getCell(right).incrementValue();
+        return List.of(topLeft, top, topRight, bottomLeft, bottom, bottomRight, left, right);
     }
 
     private boolean isInBoardBounds(Coordinate coordinate) {
@@ -130,21 +138,15 @@ public class GameBoard {
             return;
 
         Cell cell = getCell(coordinate);
-        if (cell.visible || !cell.isEmpty())
+        if (cell.visible)
             return;
 
         if (cell.open())
             numCellsOpened++;
 
-        Coordinate above = new Coordinate(coordinate.row - 1, coordinate.col);
-        Coordinate below = new Coordinate(coordinate.row + 1, coordinate.col);
-        Coordinate left = new Coordinate(coordinate.row, coordinate.col - 1);
-        Coordinate right = new Coordinate(coordinate.row, coordinate.col + 1);
-
-        openEmptyCells(above);
-        openEmptyCells(below);
-        openEmptyCells(left);
-        openEmptyCells(right);
+        if (cell.isEmpty())
+            for (Coordinate neighbour: surroundingCoordinates(coordinate))
+                openEmptyCells(neighbour);
     }
 
     public void flipBombFlag(Coordinate coordinate) {
